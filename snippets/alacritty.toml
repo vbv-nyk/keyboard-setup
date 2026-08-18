@@ -1,0 +1,10 @@
+# Append to ~/.config/alacritty/alacritty.toml
+#
+# keyd rewrites Ctrl+W -> Ctrl+Backspace system-wide. Terminals must undo that
+# on the wire: Ctrl+Backspace natively transmits 0x08 (^H, delete ONE CHAR),
+# but readline / tmux / neovim expect 0x17 (^W, delete one WORD).
+# Without this, word-delete silently degrades to char-delete in the terminal.
+[[keyboard.bindings]]
+key = "Back"
+mods = "Control"
+chars = "\u0017"
