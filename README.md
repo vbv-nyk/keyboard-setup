@@ -10,6 +10,10 @@ GTK, Qt, Electron, browsers, terminals, and neovim -- with no per-app setup.
 | `Shift+Escape` held, then `h` `j` `k` `l` | Left / Down / Up / Right |
 | `Escape` alone | Plain, instant Escape -- unchanged |
 
+Escape here means **the key you press as Escape**. If you swap Caps and Escape
+(`caps:swapescape`), that is the physical CapsLock key, and the config must name
+it `capslock` -- see [Key names](#key-names-keyd-sits-below-xkb).
+
 ## Install
 
 ```sh
@@ -50,6 +54,24 @@ The first is load-bearing; the second is a bonus, because the mapper relies on
 window-title detection and is unreliable under Hyprland. Either alone would
 work, and running both is harmless.
 
+### Key names: keyd sits below XKB
+
+keyd reads raw evdev keycodes, before XKB ever touches them. So an XKB-level
+swap -- `setxkbmap -option caps:swapescape`, Hyprland's `kb_options`, or a
+`/etc/X11/xorg.conf.d` rule -- is **invisible to keyd**.
+
+The practical consequence: if you have swapped Caps and Escape, the key you
+press as Escape is physically CapsLock, and this config must bind `capslock`.
+Binding `esc` would put the layer on the top-left key, which your swap has
+turned into CapsLock.
+
+The shipped config assumes the swap is in place and binds `capslock`. If you do
+not swap, change that one line to `esc = layer(escl)`.
+
+The ordering also explains why the tap still works: pressing the key alone is
+not bound in keyd, so it passes through untouched and XKB then turns it into
+Escape as usual.
+
 ### Why `Shift+Escape` and not bare `Escape`
 
 The obvious design -- make Escape a tap/hold key, tap for Escape and hold for
@@ -71,9 +93,11 @@ ignores the modifiers of its constituents and emits unmodified arrows.
 
 ## Tradeoffs
 
-- **`Shift+Escape` is a three-key chord** and awkward on some keyboards. The
-  config ships a commented one-handed alternative that makes CapsLock a pure
-  nav layer; uncomment the last two lines of `etc/keyd/default.conf`.
+- **`Shift+Escape` is a three-key chord.** It is comfortable when Caps and
+  Escape are swapped (the layer key sits on the home row) and awkward when they
+  are not, since you are then reaching for the top-left corner with Shift held.
+- **`Shift+Escape` as a shortcut is consumed.** Few applications bind it, but if
+  one you use does, it will no longer reach that application.
 - **Terminals not covered by a snippet** fall back to `app.conf`, which is only
   as reliable as window-title detection. Add a snippet for your terminal if
   `Ctrl+W` starts deleting single characters.
